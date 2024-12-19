@@ -1,0 +1,8 @@
+[package]
+name = "xcp-tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+socketcan = "3.3.1"
+bitfield = "0.17.0"
