@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 socketcan = "3.3.1"
 bitfield = "0.17.0"
+serial_test = "0.4.0"

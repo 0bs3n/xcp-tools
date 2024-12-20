@@ -158,6 +158,108 @@ impl XcpResponseCode {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Default)]
+pub enum XcpErrorCode {
+    /// Command processor synchronization.
+    ErrCmdSynch = 0x00,
+
+    /// Command was not executed.
+    ErrCmdBusy = 0x10,
+
+    /// Command rejected because DAQ is running.
+    ErrDaqActive = 0x11,
+
+    /// Command rejected because PGM is running.
+    ErrPgmActive = 0x12,
+
+    /// Unknown command or not implemented optional command.
+    ErrCmdUnknown = 0x20,
+
+    /// Command syntax invalid.
+    ErrCmdSyntax = 0x21,
+
+    /// Command syntax valid but command parameter(s) out of range.
+    ErrOutOfRange = 0x22,
+
+    /// The memory location is write protected.
+    ErrWriteProtected = 0x23,
+
+    /// The memory location is not accessible.
+    ErrAccessDenied = 0x24,
+
+    /// Access denied, Seed & Key is required.
+    ErrAccessLocked = 0x25,
+
+    /// Selected page not available.
+    ErrPageNotValid = 0x26,
+
+    /// Selected mode not available.
+    ErrModeNotValid = 0x27,
+
+    /// Selected segment not valid.
+    ErrSegmentNotValid = 0x28,
+
+    /// Sequence error.
+    ErrSequence = 0x29,
+
+    /// DAQ configuration not valid.
+    ErrDaqConfig = 0x2A,
+
+    /// Memory overflow error.
+    ErrMemoryOverflow = 0x30,
+
+    /// Generic error.
+    ErrGeneric = 0x31,
+
+    /// The slave internal program verify routine detects an error.
+    ErrVerify = 0x32,
+
+    /// Access to the requested resource is temporary not possible.
+    ErrResourceTemporaryNotAccessible = 0x33,
+
+    /// Unknown sub command or not implemented optional sub command.
+    ErrSubcmdUnknown = 0x34,
+
+    /// Fake error code representing an unknown error
+    #[default]
+    ErrUnknown = 0xFF
+}
+
+
+impl XcpErrorCode {
+    /// Converts a u8 code to an XcpError.
+    pub fn from_code(code: u8) -> Self {
+        match code {
+            0x00 => XcpErrorCode::ErrCmdSynch,
+            0x10 => XcpErrorCode::ErrCmdBusy,
+            0x11 => XcpErrorCode::ErrDaqActive,
+            0x12 => XcpErrorCode::ErrPgmActive,
+            0x20 => XcpErrorCode::ErrCmdUnknown,
+            0x21 => XcpErrorCode::ErrCmdSyntax,
+            0x22 => XcpErrorCode::ErrOutOfRange,
+            0x23 => XcpErrorCode::ErrWriteProtected,
+            0x24 => XcpErrorCode::ErrAccessDenied,
+            0x25 => XcpErrorCode::ErrAccessLocked,
+            0x26 => XcpErrorCode::ErrPageNotValid,
+            0x27 => XcpErrorCode::ErrModeNotValid,
+            0x28 => XcpErrorCode::ErrSegmentNotValid,
+            0x29 => XcpErrorCode::ErrSequence,
+            0x2A => XcpErrorCode::ErrDaqConfig,
+            0x30 => XcpErrorCode::ErrMemoryOverflow,
+            0x31 => XcpErrorCode::ErrGeneric,
+            0x32 => XcpErrorCode::ErrVerify,
+            0x33 => XcpErrorCode::ErrResourceTemporaryNotAccessible,
+            0x34 => XcpErrorCode::ErrSubcmdUnknown,
+            _ => XcpErrorCode::ErrUnknown
+        }
+    }
+
+    pub fn to_code(&self) -> u8 {
+        *self as u8
+    }
+}
+
+
 /// Trait for XCP commands, providing a method to encode commands into CAN frames.
 pub trait XcpCommand {
     fn to_can_frame(&self) -> Vec<u8>;
@@ -191,8 +293,7 @@ pub struct XcpResponseFrame<T: XcpResponse> {
 impl<T: XcpResponse> XcpResponseFrame<T> {
     /// Decode a CAN frame into an XCP response frame.
     pub fn from_can_frame(frame: &[u8]) -> Self {
-        XcpResponseFrame {
-            data: T::from_can_frame(frame),
-        }
+            XcpResponseFrame { data: T::from_can_frame(frame) }
     }
 }
+
